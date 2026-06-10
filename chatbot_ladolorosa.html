@@ -1,0 +1,2953 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- =========================================================
+       PROYECTO: Chatbot académico institucional
+       INSTITUCIÓN: Unidad Educativa Fiscomisional “La Dolorosa”
+       TECNOLOGÍAS USADAS:
+       - HTML5: estructura de la página.
+       - CSS3: diseño visual, colores, tarjetas, animaciones y responsive.
+       - JavaScript Vanilla: lógica del chatbot sin librerías externas.
+       - SVG: dibujo del robot del chatbot.
+       - Imagen local: escudo institucional cargado desde ./img/dolorosa.png.
+       NOTA: Este proyecto usa JavaScript, no Java.
+       ========================================================= -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Chatbot académico de la Unidad Educativa Fiscomisional La Dolorosa" />
+  <title>Chatbot Académico | UEF La Dolorosa</title>
+
+ <style> 
+    /* =========================================================
+       CSS3 - VARIABLES GENERALES DEL DISEÑO
+       Aquí se guardan colores, sombras y medidas para reutilizarlas.
+       ========================================================= */
+    :root {
+      --azul: #0b3f9c;
+      --azul-oscuro: #071f55;
+      --azul-claro: #2b7de9;
+      --dorado: #d69a1e;
+      --dorado-claro: #f6c75a;
+      --texto: #10224a;
+      --blanco: #ffffff;
+      --gris: #edf5ff;
+      --sombra: 0 18px 45px rgba(10, 58, 145, 0.18);
+      --radio: 28px;
+    }
+
+    /* Reinicio básico para evitar espacios por defecto del navegador. */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--texto);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background:
+        radial-gradient(circle at 12% 15%, rgba(255,255,255,.75) 0 2px, transparent 3px),
+        radial-gradient(circle at 85% 25%, rgba(255,255,255,.65) 0 2px, transparent 3px),
+        radial-gradient(circle at 50% 70%, rgba(255,255,255,.55) 0 2px, transparent 3px),
+        linear-gradient(180deg, #dff2ff 0%, #b9ddff 32%, #d8efff 65%, #0c3b87 100%);
+      background-size: 90px 90px, 120px 120px, 75px 75px, auto;
+      background-attachment: fixed;
+    }
+
+    /* Contenedor central para que todo quede alineado. */
+    .page {
+      width: min(1180px, calc(100% - 34px));
+      margin: 0 auto;
+    }
+
+    /* =========================================================
+       MENÚ SUPERIOR
+       ========================================================= */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      margin-top: 14px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,.85);
+      border-radius: 0 0 24px 24px;
+      box-shadow: 0 10px 25px rgba(18,70,150,.12);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 280px;
+    }
+
+    /* Caja para el logo/escudo institucional.
+       La imagen real debe estar en: img/dolorosa.png */
+    .crest,
+    .hero-crest,
+    .about-logo,
+    .footer-crest {
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+    }
+
+    .crest {
+      width: 88px;
+      height: 88px;
+      border-radius: 18px;
+      background: linear-gradient(150deg, #fff4cf, #ffffff);
+      border: 2px solid rgba(214,154,30,.34);
+      box-shadow: 0 10px 20px rgba(0,0,0,.12);
+    }
+
+    .logo-img,
+    .hero-crest-img,
+    .about-logo-img {
+      width: 80%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+
+    .brand-text small {
+      display: block;
+      font-size: 13px;
+      line-height: 1.1;
+      color: #223a73;
+      font-weight: 700;
+    }
+
+    .brand-text strong {
+      display: block;
+      font-size: 23px;
+      color: #0b2d72;
+      letter-spacing: .4px;
+      line-height: 1;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      font-size: 15px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .nav-links a {
+      color: var(--texto);
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--azul-claro);
+    }
+
+    .top-btn {
+      border: none;
+      border-radius: 14px;
+      padding: 13px 21px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+      box-shadow: 0 12px 24px rgba(10,58,145,.25);
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: .2s ease;
+    }
+
+    .top-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px rgba(10,58,145,.35);
+    }
+
+    /* =========================================================
+       PORTADA PRINCIPAL
+       ========================================================= */
+    .hero {
+      min-height: 560px;
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      align-items: center;
+      gap: 30px;
+      padding: 42px 0 26px;
+    }
+
+    .hero-left {
+      position: relative;
+      min-height: 520px;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-crest {
+      position: absolute;
+      left: 0;
+      top: 4px;
+      width: 245px;
+      height: 245px;
+      z-index: 1;
+      border-radius: 34px;
+      filter: drop-shadow(0 16px 22px rgba(20,60,120,.18));
+    }
+
+    .hero-bot {
+      position: absolute;
+      left: 88px;
+      bottom: 5px;
+      width: 330px;
+      height: 330px;
+      z-index: 2;
+      filter: drop-shadow(0 18px 22px rgba(10,45,110,.22));
+      animation: flotar 4.5s ease-in-out infinite;
+    }
+
+    .hero-bot svg,
+    .hero-crest svg,
+    .crest svg,
+    .footer-crest svg,
+    .bot-icon svg,
+    .chat-fab svg,
+    .chat-top-icon svg {
+      width: 80%;
+      height: 100%;
+      display: block;
+    }
+
+    @keyframes flotar {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .hero-text {
+      position: relative;
+      z-index: 3;
+      margin-left: 335px;
+      max-width: 460px;
+    }
+
+    .hero-text h1 {
+      font-size: clamp(35px, 4.8vw, 60px);
+      line-height: .98;
+      letter-spacing: -1.4px;
+      color: #082c72;
+      margin-bottom: 20px;
+    }
+
+    .hero-text h1 span {
+      color: var(--dorado);
+    }
+
+    .hero-text p {
+      font-size: 20px;
+      line-height: 1.45;
+      color: #203a73;
+      margin-bottom: 28px;
+      font-weight: 550;
+    }
+
+    .bubble {
+      position: relative;
+      max-width: 380px;
+      padding: 22px 28px;
+      border-radius: 24px;
+      color: #fff;
+      background: linear-gradient(135deg, #08307e, #0c55c3);
+      box-shadow: 0 18px 34px rgba(9,54,140,.28);
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.15;
+    }
+
+    .bubble::before {
+      content: "";
+      position: absolute;
+      left: -22px;
+      bottom: 22px;
+      width: 42px;
+      height: 42px;
+      background: #08307e;
+      clip-path: polygon(100% 0, 0 50%, 100% 100%);
+    }
+
+    /* =========================================================
+       TARJETA DE CHAT DE LA PORTADA
+       ========================================================= */
+    .phone {
+      width: min(390px, 100%);
+      justify-self: end;
+      padding: 18px;
+      border-radius: 34px;
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,.8);
+      box-shadow: var(--sombra);
+    }
+
+    .phone-header {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(10,58,145,.12);
+      padding: 0 6px 12px;
+      margin-bottom: 16px;
+    }
+
+    .phone-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 19px;
+      font-weight: 900;
+      color: #082c72;
+    }
+
+    .bot-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: #f2f7ff;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(10,58,145,.16);
+      overflow: hidden;
+    }
+
+    .phone-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .phone-actions span {
+      width: 30px;
+      height: 30px;
+      border-radius: 9px;
+      background: #eef5ff;
+      color: #0b3d91;
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .chat-preview {
+      min-height: 270px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 12px 6px 4px;
+    }
+
+    .msg {
+      max-width: 82%;
+      padding: 14px 17px;
+      border-radius: 18px;
+      font-size: 16px;
+      line-height: 1.35;
+      box-shadow: 0 10px 18px rgba(17,55,120,.08);
+    }
+
+    .msg.bot {
+      align-self: flex-end;
+      color: white;
+      background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+      border-bottom-right-radius: 6px;
+      font-weight: 700;
+    }
+
+    .msg.user {
+      align-self: flex-start;
+      background: white;
+      border-bottom-left-radius: 6px;
+      color: #2a3353;
+    }
+
+    .phone-input {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      background: white;
+      border-radius: 999px;
+      padding: 8px;
+      box-shadow: inset 0 0 0 1px rgba(10,58,145,.08);
+    }
+
+    .phone-input input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 14px;
+      padding: 0 12px;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .phone-input button {
+      width: 46px;
+      height: 46px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* =========================================================
+       SECCIONES GENERALES
+       ========================================================= */
+    .glass-section {
+      margin: 32px 0;
+      padding: 32px;
+      border-radius: var(--radio);
+      background: rgba(255,255,255,.6);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,.76);
+      box-shadow: 0 18px 45px rgba(10, 58, 145, 0.18);
+      scroll-margin-top: 100px;
+    }
+
+    .section-title {
+      text-align: center;
+      color: #082c72;
+      font-size: 34px;
+      margin-bottom: 22px;
+      letter-spacing: -.8px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .help-card {
+      position: relative;
+      min-height: 280px;
+      padding: 28px 24px;
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: center;
+      box-shadow: 0 13px 28px rgba(12,65,150,.15);
+      border: 1px solid rgba(255,255,255,.75);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .help-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 18px 36px rgba(12,65,150,.22);
+    }
+
+    .help-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(255,255,255,.95) 0 22%, transparent 23%),
+        linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.86));
+      z-index: 0;
+    }
+
+    .help-card.gold { background: linear-gradient(145deg, #ffedb8, #fff7df 55%, #f1c455); }
+    .help-card.blue { background: linear-gradient(145deg, #cdeaff, #f1fbff 55%, #8bc4ff); }
+    .help-card.yellow { background: linear-gradient(145deg, #ffe6a9, #fff9df 55%, #efc457); }
+
+    .card-icon {
+      position: absolute;
+      top: 26px;
+      z-index: 1;
+      font-size: 78px;
+      filter: drop-shadow(0 12px 15px rgba(20,70,130,.18));
+    }
+
+    .help-card h3,
+    .help-card p,
+    .help-card button {
+      position: relative;
+      z-index: 1;
+    }
+
+    .help-card h3 {
+      color: #0b2d72;
+      font-size: 25px;
+      margin-bottom: 10px;
+    }
+
+    .help-card p {
+      color: #344469;
+      font-size: 15px;
+      line-height: 1.35;
+      margin-bottom: 18px;
+      min-height: 42px;
+    }
+
+    .card-btn,
+    .read-more {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 28px;
+      color: white;
+      background: linear-gradient(135deg, #d39316, #efbd35);
+      box-shadow: 0 10px 20px rgba(190,125,9,.25);
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .help-card.blue .card-btn {
+      background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+      box-shadow: 0 10px 20px rgba(10,58,145,.22);
+    }
+
+    .about {
+      display: grid;
+      grid-template-columns: 290px 1fr 250px;
+      gap: 28px;
+      align-items: center;
+      min-height: 300px;
+    }
+
+    .about-logo {
+      width: 100%;
+      max-width: 260px;
+      height: 260px;
+      justify-self: center;
+      filter: drop-shadow(0 15px 18px rgba(10,45,110,.18));
+    }
+
+    .about-text h2,
+    .tech-text h2,
+    .faq-box h2 {
+      font-size: 34px;
+      color: #082c72;
+      margin-bottom: 18px;
+    }
+
+    .about-text p,
+    .tech-text p,
+    .faq-box p {
+      font-size: 18px;
+      line-height: 1.45;
+      color: #1b3266;
+      margin-bottom: 20px;
+    }
+
+    .virgin {
+      width: 250px;
+      height: 285px;
+      border-radius: 50% 50% 24px 24px;
+      background:
+        radial-gradient(circle at 55% 28%, rgba(255,255,255,.78), transparent 28%),
+        linear-gradient(180deg, rgba(255,255,255,.58), rgba(59,157,230,.25));
+      display: grid;
+      place-items: center;
+      opacity: .76;
+      font-size: 115px;
+      color: #3b74aa;
+    }
+
+    .faq-box {
+      text-align: center;
+      padding: 35px 20px;
+    }
+
+    /* Sección visible para explicar qué herramientas usa el proyecto. */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .tech-item {
+      background: rgba(255,255,255,.8);
+      border: 1px solid rgba(10,58,145,.10);
+      border-radius: 18px;
+      padding: 18px;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(10,58,145,.10);
+    }
+
+    .tech-item strong {
+      display: block;
+      color: #082c72;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .tech-item span {
+      display: block;
+      color: #344469;
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+
+    /* =========================================================
+       SECCIÓN PROMOTORES DEL PROYECTO
+       ========================================================= */
+    .promotores-section {
+      margin: 32px 0;
+      padding: 40px 36px;
+      border-radius: var(--radio);
+      background: linear-gradient(180deg, #fffaf2 0%, #fff7ea 100%);
+      border: 1px solid rgba(214,154,30,.22);
+      box-shadow: 0 18px 45px rgba(88,54,20,.13);
+      scroll-margin-top: 100px;
+    }
+
+    .promotores-kicker {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #b98725;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .promotores-kicker::before,
+    .promotores-kicker::after {
+      content: "";
+      width: 64px;
+      height: 2px;
+      background: rgba(185,135,37,.42);
+    }
+
+    .promotores-title {
+      color: #2e241d;
+      font-size: clamp(38px, 5vw, 64px);
+      line-height: 1.05;
+      margin-bottom: 34px;
+      letter-spacing: -1.5px;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .promotores-title span {
+      color: #c65a35;
+      font-style: italic;
+    }
+
+    .promotores-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .promotor-card {
+      background: rgba(255,255,255,.94);
+      border: 1px solid rgba(0,0,0,.06);
+      border-radius: 20px;
+      padding: 36px 24px 32px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(51,37,20,.08);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+
+    .promotor-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px rgba(51,37,20,.16);
+    }
+
+    .promotor-photo-wrapper {
+      width: 160px;
+      height: 160px;
+      margin: 0 auto 22px;
+      border-radius: 50%;
+      border: 6px solid #f5e6c6;
+      box-shadow: 0 10px 22px rgba(0,0,0,.15);
+      overflow: hidden;
+      background: #f5f0e8;
+    }
+
+    .promotor-photo {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .promotor-card h3 {
+      color: #32251d;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 24px;
+      margin-bottom: 6px;
+    }
+
+    .promotor-grade {
+      color: #c99a30;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .promotor-role {
+      color: #5b5a58;
+      font-size: 14px;
+      line-height: 1.55;
+      margin: 0 auto;
+    }
+
+    .project-contact-card {
+      margin-top: 34px;
+      padding: 28px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #11100c, #25241f);
+      color: white;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 22px;
+      align-items: center;
+      box-shadow: 0 18px 34px rgba(0,0,0,.18);
+    }
+
+    .project-contact-card h3 {
+      font-size: 16px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: #ffd7c9;
+      margin-bottom: 14px;
+    }
+
+    .project-contact-card p {
+      color: rgba(255,255,255,.76);
+      font-size: 17px;
+      line-height: 2;
+    }
+
+    .project-contact-card p strong {
+      color: #ffd7c9;
+      font-weight: 700;
+    }
+
+    .project-contact-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .project-contact-actions a,
+    .project-contact-actions button {
+      border: none;
+      text-decoration: none;
+      border-radius: 999px;
+      padding: 12px 18px;
+      color: #1f1712;
+      background: #fff3d0;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(0,0,0,.16);
+    }
+
+    .footer-project-contact {
+      width: min(1180px, calc(100% - 34px));
+      margin: 28px auto 0;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255,255,255,.14);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      align-items: end;
+    }
+
+    .footer-project-contact h4 {
+      letter-spacing: 6px;
+      color: #ffd7c9;
+      margin-bottom: 14px;
+    }
+
+    .footer-project-contact p {
+      font-size: 16px;
+      line-height: 1.9;
+      color: rgba(255,255,255,.72);
+    }
+
+    .footer-made {
+      text-align: right;
+      color: rgba(255,255,255,.58);
+    }
+
+    /* =========================================================
+       FOOTER
+       ========================================================= */
+    footer {
+      margin-top: 28px;
+      background: linear-gradient(135deg, rgba(5,32,92,.94), rgba(7,68,155,.94));
+      color: white;
+      padding: 34px 0 12px;
+      box-shadow: 0 -10px 25px rgba(6,37,96,.2);
+    }
+
+    .footer-grid {
+      width: min(1180px, calc(100% - 34px));
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .footer-brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .footer-crest {
+      width: 90px;
+      height: 90px;
+      border-radius: 18px;
+      background: white;
+      border: 2px solid rgba(214,154,30,.34);
+    }
+
+    .footer-brand h3 {
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .footer-brand p,
+    footer a,
+    footer p {
+      color: rgba(255,255,255,.88);
+      text-decoration: none;
+      line-height: 1.8;
+    }
+
+    footer h4 {
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    .social {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .social span {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.16);
+    }
+
+    .copy {
+      text-align: center;
+      margin-top: 28px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,.18);
+      font-size: 13px;
+      color: rgba(255,255,255,.72);
+    }
+
+    /* =========================================================
+       CHATBOT FLOTANTE
+       ========================================================= */
+    .chat-fab {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      width: 86px;
+      height: 86px;
+      border: none;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 18px 34px rgba(8,55,142,.35);
+      cursor: pointer;
+      z-index: 200;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: 5px;
+      animation: pulso 2.6s ease-in-out infinite;
+    }
+
+    @keyframes pulso {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+
+    .chat-panel {
+      position: fixed;
+      right: 24px;
+      bottom: 118px;
+      width: min(460px, calc(100vw - 34px));
+      height: 620px;
+      max-height: calc(100vh - 135px);
+      border-radius: 26px;
+      background: rgba(255,255,255,.96);
+      box-shadow: 0 25px 60px rgba(0,0,0,.25);
+      overflow: hidden;
+      z-index: 199;
+      display: none;
+      border: 1px solid rgba(255,255,255,.8);
+    }
+
+    .chat-panel.open {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-top {
+      padding: 18px;
+      color: white;
+      background: linear-gradient(135deg, var(--azul-oscuro), var(--azul-claro));
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-top-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chat-top-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      background: white;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      padding: 2px;
+    }
+
+    .chat-top strong {
+      display: block;
+      font-size: 18px;
+    }
+
+    .chat-top small {
+      display: block;
+      color: rgba(255,255,255,.82);
+      margin-top: 2px;
+    }
+
+    .chat-close {
+      width: 38px;
+      height: 38px;
+      border: none;
+      border-radius: 12px;
+      background: rgba(255,255,255,.15);
+      color: white;
+      cursor: pointer;
+      font-size: 22px;
+    }
+
+    .chat-body {
+      flex: 1;
+      padding: 16px;
+      overflow: auto;
+      background: radial-gradient(circle at 10% 10%, rgba(183,222,255,.6), transparent 40%), #f3f8ff;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chat-message {
+      max-width: 92%;
+      padding: 13px 15px;
+      border-radius: 17px;
+      font-size: 14px;
+      line-height: 1.48;
+      box-shadow: 0 8px 18px rgba(13,65,140,.08);
+      white-space: pre-line;
+      overflow-wrap: anywhere;
+    }
+
+    .chat-message.bot {
+      align-self: flex-start;
+      background: white;
+      color: #1f315e;
+      border-bottom-left-radius: 5px;
+    }
+
+    .chat-message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+      color: white;
+      border-bottom-right-radius: 5px;
+    }
+
+
+    .chat-message a {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: fit-content;
+      max-width: 100%;
+      margin: 5px 4px 2px 0;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: #eaf2ff;
+      color: #0b3d91;
+      font-weight: 900;
+      text-decoration: none;
+      word-break: break-word;
+      box-shadow: inset 0 0 0 1px rgba(11,61,145,.10);
+    }
+
+    .chat-message.user a {
+      color: #ffffff;
+      background: rgba(255,255,255,.18);
+    }
+
+    .chat-message img {
+      display: block;
+      max-width: 100%;
+      border-radius: 12px;
+      margin-top: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.15);
+    }
+
+    .quick-options {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 8px;
+      padding: 10px 14px 12px;
+      background: #f3f8ff;
+      overflow-x: auto;
+      border-top: 1px solid rgba(10,58,145,.06);
+      scrollbar-width: thin;
+    }
+
+    .quick-options button {
+      flex: 0 0 auto;
+      border: none;
+      border-radius: 999px;
+      padding: 9px 13px;
+      background: white;
+      color: #0b3d91;
+      font-weight: 800;
+      font-size: 12px;
+      box-shadow: 0 8px 15px rgba(13,65,140,.08);
+      cursor: pointer;
+    }
+
+    .quick-options button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 18px rgba(13,65,140,.13);
+    }
+
+    .chat-input-area {
+      padding: 12px;
+      display: flex;
+      gap: 8px;
+      background: white;
+      border-top: 1px solid rgba(10,58,145,.1);
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      border: none;
+      outline: none;
+      background: var(--gris);
+      border-radius: 999px;
+      padding: 13px 15px;
+      color: var(--texto);
+      font-size: 14px;
+    }
+
+    .chat-input-area button {
+      width: 48px;
+      height: 48px;
+      border: none;
+      border-radius: 50%;
+      color: white;
+      background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* =========================================================
+       RESPONSIVE DESIGN
+       Adapta la página para tablets y celulares.
+       ========================================================= */
+    @media (max-width: 1020px) {
+      .hero { grid-template-columns: 1fr; }
+      .phone { justify-self: center; }
+      .hero-left { min-height: 500px; }
+      .cards { grid-template-columns: 1fr; }
+      .about { grid-template-columns: 1fr; text-align: center; }
+      .about-logo { max-width: 220px; height: 220px; }
+      .virgin { display: none; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .nav-links { display: none; }
+      .tech-grid { grid-template-columns: 1fr 1fr; }
+
+      .promotores-grid { grid-template-columns: 1fr; }
+      .project-contact-card { grid-template-columns: 1fr; text-align: center; }
+      .project-contact-actions { justify-content: center; }
+    }
+
+    @media (max-width: 700px) {
+      .page { width: min(100% - 20px, 1180px); }
+
+      .navbar {
+        padding: 12px;
+        border-radius: 0 0 18px 18px;
+      }
+
+      .brand { min-width: 0; }
+      .crest { width: 58px; height: 58px; }
+      .brand-text small { font-size: 11px; }
+      .brand-text strong { font-size: 17px; }
+
+      .top-btn {
+        padding: 12px 14px;
+        font-size: 13px;
+      }
+
+      .hero { padding-top: 22px; }
+
+      .hero-left {
+        min-height: auto;
+        display: block;
+        text-align: center;
+      }
+
+      .hero-crest {
+        position: relative;
+        width: 170px;
+        height: 170px;
+        margin: 0 auto;
+        left: auto;
+        top: auto;
+      }
+
+      .hero-bot {
+        position: relative;
+        left: auto;
+        bottom: auto;
+        width: 250px;
+        height: 250px;
+        margin: -20px auto 0;
+        display: block;
+      }
+
+      .hero-text {
+        margin: 0 auto;
+        max-width: 100%;
+      }
+
+      .bubble {
+        margin: 0 auto;
+        font-size: 22px;
+      }
+
+      .bubble::before { display: none; }
+
+      .glass-section {
+        padding: 18px;
+        border-radius: 22px;
+      }
+
+      .section-title,
+      .faq-box h2,
+      .about-text h2,
+      .tech-text h2 {
+        font-size: 28px;
+      }
+
+      .footer-grid,
+      .tech-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chat-panel {
+        right: 10px;
+        bottom: 104px;
+        width: calc(100vw - 20px);
+      }
+
+
+      .promotores-section { padding: 28px 18px; }
+      .promotores-kicker { letter-spacing: 3px; justify-content: center; }
+      .promotores-kicker::before,
+      .promotores-kicker::after { width: 34px; }
+      .promotores-title { text-align: center; }
+      .promotor-photo-wrapper { width: 140px; height: 140px; }
+      .promotor-card { padding: 28px 18px 24px; }
+      .promotor-card h3 { font-size: 22px; }
+      .footer-project-contact { grid-template-columns: 1fr; text-align: center; }
+      .footer-made { text-align: center; }
+
+      .chat-fab {
+        right: 18px;
+        bottom: 16px;
+        width: 76px;
+        height: 76px;
+      }
+    }
+  </style>
+  
+</head>
+
+<body>
+
+  <!-- NOTA IMPORTANTE:
+       Como este archivo está dentro de C:\xampp\htdocs\chatboydolorosa,
+       la imagen se debe llamar con ruta relativa: ./img/dolorosa.png
+       No se recomienda usar la ruta completa de Windows dentro del navegador. -->
+  <!-- =========================================================
+       SVG EN CÓDIGO
+       Estos símbolos permiten usar el robot y un escudo de respaldo
+       sin depender de librerías externas.
+       ========================================================= -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <!-- Robot del chatbot -->
+      <symbol id="robotChatbot" viewBox="0 0 360 360">
+        <defs>
+          <linearGradient id="robotBody" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#ffffff" />
+            <stop offset="1" stop-color="#dceeff" />
+          </linearGradient>
+          <linearGradient id="robotScreen" x1="0" x2="1" y1="0" y2="1">
+            <stop offset="0" stop-color="#0b3d91" />
+            <stop offset="1" stop-color="#08245e" />
+          </linearGradient>
+        </defs>
+
+        <ellipse cx="180" cy="326" rx="118" ry="20" fill="rgba(8,42,105,.18)" />
+        <path d="M96 210 C60 234 45 278 52 318 C88 304 113 280 130 248Z" fill="#1e58b8" />
+        <path d="M264 210 C300 234 315 278 308 318 C272 304 247 280 230 248Z" fill="#1e58b8" />
+        <rect x="86" y="164" width="188" height="150" rx="62" fill="url(#robotBody)" stroke="#b8d7ff" stroke-width="6" />
+        <path d="M118 244 H242 V303 H118Z" fill="#12357f" />
+        <path d="M180 244 V303" stroke="#f4c553" stroke-width="8" />
+        <circle cx="148" cy="268" r="10" fill="#f4c553" />
+        <circle cx="212" cy="268" r="10" fill="#f4c553" />
+        <rect x="82" y="72" width="196" height="122" rx="54" fill="url(#robotBody)" stroke="#b8d7ff" stroke-width="6" />
+        <rect x="111" y="104" width="138" height="62" rx="30" fill="url(#robotScreen)" />
+        <circle cx="151" cy="135" r="18" fill="#9ff0ff" />
+        <circle cx="209" cy="135" r="18" fill="#9ff0ff" />
+        <circle cx="145" cy="129" r="6" fill="white" />
+        <circle cx="203" cy="129" r="6" fill="white" />
+        <path d="M164 154 C174 163 189 163 199 154" stroke="#9ff0ff" stroke-width="5" fill="none" stroke-linecap="round" />
+        <circle cx="78" cy="134" r="22" fill="#ffffff" stroke="#b8d7ff" stroke-width="6" />
+        <circle cx="282" cy="134" r="22" fill="#ffffff" stroke="#b8d7ff" stroke-width="6" />
+        <rect x="133" y="27" width="94" height="32" rx="8" fill="#102f75" />
+        <path d="M100 34 H260 L180 8 Z" fill="#102f75" />
+        <circle cx="103" cy="39" r="8" fill="#f4c553" />
+        <circle cx="257" cy="39" r="8" fill="#f4c553" />
+        <path d="M72 112 C74 72 104 48 146 43" stroke="#0b3d91" stroke-width="8" fill="none" stroke-linecap="round" />
+        <path d="M288 112 C286 72 256 48 214 43" stroke="#0b3d91" stroke-width="8" fill="none" stroke-linecap="round" />
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- =========================================================
+       MENÚ PRINCIPAL
+       ========================================================= -->
+  <header class="page navbar">
+    <div class="brand">
+      <div class="crest">
+        <img src="./img/dolorosa.png" alt="Escudo institucional" class="logo-img">
+      </div>
+
+      <div class="brand-text">
+        <small>Unidad Educativa Fiscomisional</small>
+        <strong>LA DOLOROSA</strong>
+      </div>
+    </div>
+
+    <nav class="nav-links" aria-label="Menú principal">
+      <a href="#inicio">Inicio</a>
+      <a href="#sobre">Sobre Nosotros</a>
+      <a href="#faq">Preguntas Frecuentes</a>
+      <a href="#promotores">Promotores</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+
+    <button class="top-btn" type="button" onclick="openChat()">💬 Haz tu consulta</button>
+  </header>
+
+  <main id="inicio" class="page">
+    <!-- =========================================================
+         PORTADA PRINCIPAL
+         ========================================================= -->
+    <section class="hero">
+      <div class="hero-left">
+        <div class="hero-crest">
+          <img src="./img/dolorosa.png" alt="Escudo institucional" class="hero-crest-img">
+        </div>
+
+        <div class="hero-bot">
+          <svg aria-label="Robot chatbot"><use href="#robotChatbot"></use></svg>
+        </div>
+
+        <div class="hero-text">
+          <h1>¡Hola! Soy el Chatbot de <span>Consultas</span> Académicas</h1>
+          <p>
+            Bienvenido al Chatbot de la Unidad Educativa Fiscomisional <b>La Dolorosa</b>.
+            Estoy aquí para ayudarte con tus consultas académicas e institucionales.
+          </p>
+          <div class="bubble">Hola, ¿qué tal? Estoy listo para trabajar.</div>
+        </div>
+      </div>
+
+      <!-- Tarjeta visual que simula una conversación del chatbot. -->
+      <div class="phone">
+        <div class="phone-header">
+          <div class="phone-title">
+            <span class="bot-icon"><svg aria-label="Bot del chat"><use href="#robotChatbot"></use></svg></span>
+            Chat
+          </div>
+
+          <div class="phone-actions" aria-hidden="true">
+            <span>#</span>
+            <span>👤</span>
+            <span>↗</span>
+          </div>
+        </div>
+
+        <div class="chat-preview">
+          <div class="msg bot">¡Hola! ¿En qué puedo ayudarte hoy?</div>
+          <div class="msg user">Quisiera saber el horario de atención.</div>
+          <div class="msg user">Busco información sobre requisitos de admisión.</div>
+        </div>
+
+        <div class="phone-input">
+          <input placeholder="Escribe tu consulta..." onclick="openChat()" readonly aria-label="Abrir chatbot" />
+          <button type="button" onclick="openChat()">➜</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         TARJETAS DE AYUDA RÁPIDA
+         ========================================================= -->
+    <section class="glass-section" id="servicios">
+      <h2 class="section-title">¿Cómo puedo ayudarte?</h2>
+
+      <div class="cards">
+        <article class="help-card gold">
+          <div class="card-icon" aria-hidden="true">📋</div>
+          <h3>Admisiones y Requisitos</h3>
+          <p>Conoce requisitos, documentos y pasos para el proceso de admisión.</p>
+          <button class="card-btn" type="button" onclick="askQuick('requisitos de admisión')">Consulta aquí</button>
+        </article>
+
+        <article class="help-card blue">
+          <div class="card-icon" aria-hidden="true">🎓</div>
+          <h3>Información Institucional</h3>
+          <p>Conoce sobre la oferta educativa, autoridades, jornadas y servicios que ofrece la institución.</p>
+          <button class="card-btn" type="button" onclick="askQuick('información institucional')">Consulta aquí</button>
+        </article>
+
+        <article class="help-card yellow">
+          <div class="card-icon" aria-hidden="true">📖</div>
+          <h3>Documentos y Recursos</h3>
+          <p>Accede a documentos institucionales, lista de útiles, uniformes e informativos oficiales.</p>
+          <button class="card-btn" type="button" onclick="askQuick('documentos institucionales')">Consulta aquí</button>
+        </article>
+      </div>
+    </section>
+
+    <!-- =========================================================
+         SOBRE LA INSTITUCIÓN
+         ========================================================= -->
+    <section class="glass-section about" id="sobre">
+      <div class="about-logo">
+        <img src="./img/dolorosa.png" alt="Escudo de La Dolorosa" class="about-logo-img">
+      </div>
+
+      <div class="about-text">
+        <h2>Sobre UEF La Dolorosa</h2>
+        <p>
+          La Unidad Educativa Fiscomisional La Dolorosa es una institución católica dedicada a brindar
+          educación de calidad con valores cristianos. Su objetivo es formar estudiantes integrales,
+          responsables y comprometidos con su comunidad.
+        </p>
+        <button class="read-more" type="button" onclick="askQuick('historia institucional')">Leer más</button>
+      </div>
+
+      <div class="virgin" aria-hidden="true">♡</div>
+    </section>
+
+    <!-- =========================================================
+         PREGUNTAS FRECUENTES
+         ========================================================= -->
+    <section class="glass-section faq-box" id="faq">
+      <h2>Preguntas Frecuentes</h2>
+      <p>
+        Puedes escribir preguntas como: “requisitos de inscripción”, “matrículas”,
+        “horario DECE”, “promotores del proyecto”,
+        “contacto del proyecto”, “teléfono”, “ubicación”, “autoridades”, “valores”,
+        “documentos institucionales” o “lista de útiles”.
+      </p>
+    </section>
+
+
+
+    <!-- =========================================================
+         PROMOTORES DEL PROYECTO
+         ========================================================= -->
+    <section class="promotores-section" id="promotores">
+      <div class="promotores-kicker">Quiénes somos</div>
+      <h2 class="promotores-title">Los Promotores del <span>Proyecto</span></h2>
+
+      <div class="promotores-grid">
+        <article class="promotor-card">
+          <div class="promotor-photo-wrapper">
+            <img src="./img/sanchez.jpeg" alt="Sánchez Jimenes" class="promotor-photo">
+          </div>
+          <h3>Sánchez Jimenes</h3>
+          <div class="promotor-grade">Desarrollador</div>
+          <p class="promotor-role">Encargado del desarrollo frontend y la integración de componentes visuales del chatbot.</p>
+        </article>
+
+        <article class="promotor-card">
+          <div class="promotor-photo-wrapper">
+            <img src="./img/yunga.jpeg" alt="Yunga Juan" class="promotor-photo">
+          </div>
+          <h3>Yunga Juan</h3>
+          <div class="promotor-grade">Desarrollador Principal</div>
+          <p class="promotor-role">Líder del proyecto, responsable de la arquitectura del sistema, backend del chatbot y coordinación del equipo.</p>
+        </article>
+
+        <article class="promotor-card">
+          <div class="promotor-photo-wrapper">
+            <img src="./img/rueda.jpeg" alt="Rueda Jiemenez" class="promotor-photo">
+          </div>
+          <h3>Rueda Jiemenez</h3>
+          <div class="promotor-grade">Desarrollador</div>
+          <p class="promotor-role">Encargado del desarrollo backend, la base de conocimiento del chatbot y la documentación del proyecto.</p>
+        </article>
+      </div>
+
+      <div class="project-contact-card">
+        <div>
+          <h3>Contacto</h3>
+          <p>
+            <strong>Correo:</strong> yungajuan799@gmail.com<br>
+            <strong>Teléfono:</strong> 0981600692<br>
+            Loja, Ecuador
+          </p>
+        </div>
+
+        <div class="project-contact-actions">
+          <a href="mailto:yungajuan799@gmail.com">Enviar correo</a>
+          <a href="tel:+0981600692">Llamar</a>
+          <button type="button" onclick="askQuick('contacto del proyecto')">Preguntar al chatbot</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================
+       PIE DE PÁGINA
+       ========================================================= -->
+  <footer id="contacto">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="footer-crest">
+          <img src="./img/dolorosa.png" alt="Escudo institucional" class="logo-img">
+        </div>
+
+        <div>
+          <h3>Unidad Educativa Fiscomisional<br>LA DOLOROSA</h3>
+          <p>Miguel Riofrío y José Antonio Eguiguren<br>Loja, Ecuador</p>
+        </div>
+      </div>
+
+      <div>
+        <h4>Menú</h4>
+        <p><a href="#inicio">Inicio</a></p>
+        <p><a href="#sobre">Sobre Nosotros</a></p>
+        <p><a href="#faq">FAQ</a></p>
+        <p><a href="#promotores">Promotores</a></p>
+      </div>
+
+      <div>
+        <h4>Contacto</h4>
+        <p>☎ Celular: 0997324951</p>
+        <p>☎ Secretaría: 072570388</p>
+        <p>✉ secretaria@ladolorosa-loja.edu.ec</p>
+      </div>
+
+      <div>
+        <h4>Síguenos</h4>
+        <p><a href="https://www.facebook.com/UEFLD/" target="_blank" rel="noopener">Facebook institucional</a></p>
+        <div class="social" aria-hidden="true">
+          <span>f</span>
+          <span>𝕏</span>
+          <span>◎</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="copy">
+      © 2026 Unidad Educativa Fiscomisional La Dolorosa. Todos los derechos reservados.
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       BOTÓN FLOTANTE DEL CHATBOT
+       ========================================================= -->
+  <button class="chat-fab" id="chatFab" type="button" aria-label="Abrir chat">
+    <svg aria-label="Chatbot"><use href="#robotChatbot"></use></svg>
+  </button>
+
+  <!-- =========================================================
+       VENTANA DEL CHATBOT
+       ========================================================= -->
+  <section class="chat-panel" id="chatPanel" aria-label="Chatbot académico">
+    <div class="chat-top">
+      <div class="chat-top-title">
+        <span class="chat-top-icon"><svg aria-label="Bot del chat"><use href="#robotChatbot"></use></svg></span>
+        <div>
+          <strong>Chatbot académico</strong>
+          <small>Asistente virtual</small>
+        </div>
+      </div>
+      <button class="chat-close" id="chatCloseBtn" type="button" aria-label="Cerrar chat">×</button>
+    </div>
+
+    <div class="chat-body" id="chatBody">
+      <div class="chat-message bot">
+        ¡Hola! ¿Qué tal? Soy el asistente virtual de La Dolorosa. Estoy listo para ayudarte con tus consultas académicas e institucionales.
+
+Ejemplos:
+• requisitos de inscripción
+• documentos institucionales
+• lista de útiles
+• matrícula
+• contacto
+      </div>
+    </div>
+
+    <div class="quick-options" aria-label="Opciones rápidas del chatbot">
+      <button type="button" onclick="askQuick('menu')">Menú</button>
+      <button type="button" onclick="askQuick('requisitos de admisión')">Admisiones</button>
+      <button type="button" onclick="askQuick('matrícula')">Matrícula</button>
+      <button type="button" onclick="askQuick('documentos institucionales')">Documentos</button>
+      <button type="button" onclick="askQuick('informativo institucional')">Informativo</button>
+      <button type="button" onclick="askQuick('contacto')">Contacto</button>
+    </div>
+
+    <div class="chat-input-area">
+      <input id="chatInput" type="text" placeholder="Escribe tu consulta..." autocomplete="off" />
+      <button id="chatSendBtn" type="button" aria-label="Enviar mensaje">➜</button>
+    </div>
+  </section>
+
+  <script>
+    /* =========================================================
+       JAVASCRIPT VANILLA - LÓGICA DEL CHATBOT
+       Este script controla:
+       1. Abrir y cerrar la ventana del chat.
+       2. Enviar mensajes escritos por el usuario.
+       3. Buscar palabras clave en la pregunta.
+       4. Mostrar una respuesta automática.
+       ========================================================= */
+
+    document.addEventListener("DOMContentLoaded", function () {
+      /* Capturamos los elementos HTML que necesita el chatbot. */
+      const chatPanel = document.getElementById("chatPanel");
+      const chatBody = document.getElementById("chatBody");
+      const chatInput = document.getElementById("chatInput");
+      const chatFab = document.getElementById("chatFab");
+      const chatCloseBtn = document.getElementById("chatCloseBtn");
+      const chatSendBtn = document.getElementById("chatSendBtn");
+
+      /* Validación: si falta algún elemento, se detiene el script. */
+      if (!chatPanel || !chatBody || !chatInput || !chatFab || !chatCloseBtn || !chatSendBtn) {
+        console.error("Faltan elementos necesarios para ejecutar el chatbot.");
+        return;
+      }
+
+      /* Base de conocimiento del chatbot.
+         Cada bloque tiene palabras clave y una respuesta. */
+      const knowledgeBase = [
+        {
+          keywords: ["hola", "buenos dias", "buenas tardes", "buenas noches", "saludos", "hey"],
+          response: `¡Hola! ¿Qué tal? Soy el asistente virtual de la Unidad Educativa Fiscomisional “La Dolorosa”. Estoy listo para ayudarte.
+
+Puedo consultar sobre:
+• Inscripciones
+• Matrículas
+• Requisitos
+• Horarios de entrevistas
+• Contactos
+• Ubicación
+• Autoridades
+• Jornadas
+• Valores de matrícula y pensión
+• Retiro de carpeta
+• Información institucional
+• Documentos institucionales
+• Promotores del proyecto
+• Contacto del proyecto
+• Información cargada desde la página web institucional`
+        },
+        {
+          keywords: ["menu", "opciones", "que puedes hacer", "ayuda", "informacion"],
+          response: `Puedes preguntarme, por ejemplo:
+
+• ¿Cuándo son las inscripciones?
+• ¿Cuáles son los requisitos para estudiantes nuevos?
+• ¿Cuál es el horario de entrevista del DECE?
+• ¿Dónde está ubicada la institución?
+• ¿Cuál es el número de teléfono?
+• ¿Cuál es el correo institucional?
+• ¿Cuánto cuesta la matrícula?
+• ¿Cuánto cuesta la pensión?
+• ¿Cuáles son las jornadas?
+• ¿Quién es el rector?
+• ¿Qué debo hacer para retirar carpeta?
+• ¿Cuál es la página web?
+• ¿Quiénes son los promotores del proyecto?
+• ¿Cuál es el contacto del proyecto?
+• Documentos institucionales
+• Lista de útiles 2025-2026
+• Uniformes 2025-2026
+• Galería de fotos
+• Informativo institucional`
+        },
+        {
+          keywords: ["inscripcion", "inscripciones", "inscribir", "aspirante", "estudiante nuevo", "nuevos estudiantes", "inicial ii", "tercero de bachillerato"],
+          response: `INSCRIPCIONES PERIODO 2026-2027
+
+Las inscripciones para estudiantes nuevos, desde Inicial II hasta Tercero de Bachillerato, se realizan del 11 al 28 de mayo.
+
+Pasos principales:
+1. Realizar la inscripción en la página web:
+www.ladolorosa-loja.edu.ec
+
+2. Desde el 19 de mayo se realizan las entrevistas con el estudiante.
+
+3. Asistir a la entrevista del DECE con los documentos de inscripción.
+
+4. Luego se continúa con entrevista institucional, inspección, colecturía y secretaría.`
+        },
+        {
+          keywords: ["pasos inscripcion", "pasos para inscripcion", "proceso de inscripcion", "como inscribo", "como inscribir"],
+          response: `PASOS PARA EL PROCESO DE INSCRIPCIÓN
+
+1. Inscripción en la página web:
+www.ladolorosa-loja.edu.ec
+Desde el 11 de mayo.
+
+2. Entrevista DECE:
+Horario: 07H00 a 10H00 / 13H00 a 16H00.
+Debe traer los documentos de inscripción.
+
+3. Entrevista institucional:
+Horario: 08H00 a 12H00 / 13H00 a 17H00.
+Participan Rector, Vicerrector y Coordinación Académica.
+
+4. Inspección:
+Revisión de parámetros disciplinarios y políticas institucionales.
+
+5. Colecturía.
+
+6. Secretaría.`
+        },
+        {
+          keywords: ["dece", "entrevista dece", "horario dece", "documentos dece"],
+          response: `ENTREVISTA CON EL DECE
+
+Horario:
+• 07H00 a 10H00
+• 13H00 a 16H00
+
+Debe asistir el estudiante y llevar los documentos de inscripción.
+
+Requisitos principales:
+• Hoja de inscripción realizada en la página web institucional.
+• Copia de cédula del aspirante y representante.
+• Libreta de calificaciones del 1er y 2do trimestre con comportamiento.
+• Copia de Fe de Bautizo.
+• Certificado médico actualizado, si existe una necesidad educativa específica asociada o no a discapacidad.
+• Certificados de actividades académicas o deportivas extracurriculares avaladas por las instituciones correspondientes.`
+        },
+        {
+          keywords: ["requisitos inscripcion", "requisitos de admision", "documentos inscripcion", "que documentos necesito", "documentos para inscribir", "requisitos para inscribir"],
+          response: `REQUISITOS PARA LA INSCRIPCIÓN EN LA ENTREVISTA CON EL DECE
+
+• Hoja de inscripción realizada en la página web institucional.
+• Copia de cédula del aspirante.
+• Copia de cédula del representante.
+• Libreta de calificaciones del 1er y 2do trimestre con comportamiento.
+• Copia de Fe de Bautizo.
+• Certificado médico actualizado, en caso de necesidad educativa específica asociada o no a discapacidad.
+• Certificado de actividades extracurriculares académicas o deportivas, avaladas por el Ministerio de Educación, Ministerio del Deporte o Municipio, donde conste el horario correspondiente.`
+        },
+        {
+          keywords: ["horario", "horarios", "horario entrevista", "entrevista", "a que hora entrevista", "hora entrevista", "horarios de atencion"],
+          response: `HORARIOS DE ENTREVISTAS
+
+Entrevista DECE:
+• 07H00 a 10H00
+• 13H00 a 16H00
+
+Entrevista institucional:
+• 08H00 a 12H00
+• 13H00 a 17H00
+
+En la entrevista institucional participan:
+• Rector: Padre Néstor Alcívar Chávez Manzanilla.
+• Vicerrector: Dr. Patricio Espinoza.
+• Coordinadora Académica: Mgs. Solange Aguilera.`
+        },
+        {
+          keywords: ["matricula", "matriculas", "matricular", "fecha de matricula", "cronograma matricula"],
+          response: `FECHAS DE MATRÍCULAS 2025-2026
+
+• Inicial II, 1ro, 2do, 3ro, 4to, 5to, 6to y 7mo Grado:
+Martes 12 de agosto.
+
+• 8vo Grado:
+Miércoles 13 y jueves 14 de agosto.
+
+• 9no y 10mo Grado:
+Viernes 15 de agosto.
+
+• 1er Curso de Bachillerato:
+Lunes 18 de agosto.
+
+• 2do Curso de Bachillerato:
+Martes 19 de agosto.
+
+• 3er Curso de Bachillerato:
+Jueves 21 de agosto.`
+        },
+        {
+          keywords: ["valor", "costo", "cuanto cuesta", "pension", "matricula cuesta", "precio"],
+          response: `VALORES DE MATRÍCULA Y PENSIÓN
+
+Para Inicial, Educación Básica y Bachillerato:
+
+• Valor de matrícula: $17,42
+• Valor de pensión: $27,87
+
+Estos valores corresponden al informativo de matrículas 2025-2026. Para confirmar valores actualizados, se recomienda consultar directamente en Colecturía o Secretaría.`
+        },
+        {
+          keywords: ["requisitos matricula nuevos", "matricula estudiantes nuevos", "documentos matricula nuevos", "requisitos estudiantes nuevos"],
+          response: `REQUISITOS PARA MATRÍCULAS DE ESTUDIANTES NUEVOS
+
+1. Imprimir ficha de datos desde:
+https://ladolorosa-loja.edu.ec/
+
+2. Imprimir ficha socioeconómica del DECE.
+
+3. Imprimir acta de compromiso de Inspección.
+
+4. Copia de cédula o partida de nacimiento del estudiante.
+
+5. Copia de cédula del padre y madre del estudiante.
+
+6. Copia de la Fe de Bautizo.
+
+7. Copia del carné de vacunas, solo para Inicial II.
+
+8. Certificado de salud público o privado externo.
+
+9. Certificados originales de matrícula y promoción de los años anteriores.
+
+10. Carpeta color azul con filo metálico para jornada matutina.
+
+11. Carpeta color amarillo con filo metálico para jornada vespertina.
+
+12. Pago de matrícula en Cooperativa de Ahorro y Crédito CHIBULEO.
+
+13. Copia de planilla de luz eléctrica con registro único nacional.
+
+14. Entregar documentación en Secretaría y legalizar según cronograma.`
+        },
+        {
+          keywords: ["requisitos matricula antiguos", "matricula estudiantes antiguos", "documentos matricula antiguos", "estudiantes antiguos"],
+          response: `REQUISITOS PARA MATRÍCULAS DE ESTUDIANTES ANTIGUOS
+
+1. Imprimir ficha de datos en la página web:
+https://ladolorosa-loja.edu.ec/
+
+2. Imprimir ficha socioeconómica del DECE.
+
+3. Imprimir acta de compromiso de Inspección.
+
+4. Realizar el pago de matrícula.
+
+5. Entregar la documentación en Secretaría y legalizar según el cronograma de matrícula.
+
+6. Llenar la ficha correspondiente en la página web institucional.`
+        },
+        {
+          keywords: ["pagina web", "web", "sitio web", "link", "enlace"],
+          response: `La página web institucional es:
+
+www.ladolorosa-loja.edu.ec
+
+Desde la página web se pueden realizar procesos como inscripción, ficha de datos del estudiante y consultas institucionales.`
+        },
+        {
+          keywords: ["promotores", "promotores del proyecto", "quienes somos", "quiénes somos", "equipo del proyecto", "integrantes del proyecto", "sanchez", "sánchez jimines", "yunga", "yunga juan", "rueda", "rueda jiemenez"],
+          response: `PROMOTORES DEL PROYECTO
+
+Los promotores del proyecto son:
+
+• Sánchez Jimenes
+Desarrollador.
+Encargado del desarrollo frontend y la integración de componentes visuales del chatbot.
+
+• Yunga Juan
+Desarrollador Principal.
+Líder del proyecto, responsable de la arquitectura del sistema, backend del chatbot y coordinación del equipo.
+
+• Rueda Jiemenez
+Desarrollador.
+Encargado del desarrollo backend, la base de conocimiento del chatbot y la documentación del proyecto.
+
+Ellos participan en la elaboración, investigación y presentación del chatbot académico institucional.`
+        },
+        {
+          keywords: ["contacto del proyecto", "correo del proyecto", "telefono del proyecto", "teléfono del proyecto", "colabora con nosotros", "colaborar", "colabora", "hecho con amor", "hecho con"],
+          response: `CONTACTO DEL PROYECTO
+
+Correo:
+• yungajuan799@gmail.com
+
+Teléfono:
+• 0981600692
+
+Ubicación:
+• Loja, Ecuador
+
+Hecho con ♥ en Loja, Ecuador.`
+        },
+        {
+          keywords: ["contacto", "telefono", "celular", "numero", "llamar", "convencional"],
+          response: `CONTACTOS DE LA INSTITUCIÓN
+
+Celular:
+• 0997324951
+
+Teléfonos convencionales:
+• 072570388 Rectorado / Secretaría
+• 072574415 Colecturía
+• 072574870 Coordinación Académica Jornada Vespertina
+
+Extensiones:
+• 102 Secretaría
+• 103 Rectorado
+• 105 Inspectoría General
+• 106 Coordinación Académica Jornada Nocturna
+• 108 DECE`
+        },
+        {
+          keywords: ["correo", "email", "mail", "correo institucional"],
+          response: `CORREOS INSTITUCIONALES
+
+• uevaa@hotmail.com
+• secretaria@ladolorosa-loja.edu.ec`
+        },
+        {
+          keywords: ["direccion", "ubicacion", "donde queda", "donde esta", "mapa", "lugar"],
+          response: `UBICACIÓN
+
+La Unidad Educativa Fiscomisional “La Dolorosa” se encuentra en Loja, Ecuador.
+
+Dirección referencial:
+• Miguel Riofrío y José Antonio Eguiguren.
+
+También puede ubicarse en el mapa como:
+Unidad Educativa Fiscomisional “La Dolorosa”, Loja, Ecuador.`
+        },
+        {
+          keywords: ["facebook", "redes", "red social", "pagina facebook"],
+          response: `FACEBOOK INSTITUCIONAL
+
+Puedes encontrar a la institución en Facebook en:
+
+https://www.facebook.com/UEFLD/`
+        },
+        {
+          keywords: ["jornada", "jornadas", "matutina", "vespertina", "nocturna"],
+          response: `JORNADAS DE LA INSTITUCIÓN
+
+La Unidad Educativa Fiscomisional “La Dolorosa” cuenta con tres jornadas:
+
+• Matutina
+• Vespertina
+• Nocturna`
+        },
+        {
+          keywords: ["oferta educativa", "niveles", "que niveles tiene", "bachillerato", "basica", "inicial"],
+          response: `OFERTA EDUCATIVA
+
+La institución ofrece los siguientes niveles:
+
+• Educación Inicial
+• Educación General Básica
+• Bachillerato General Unificado en Ciencias
+• Bachillerato General Unificado Técnico
+• Bachillerato General Unificado Técnico Industrial
+
+La oferta educativa se desarrolla en jornadas matutina, vespertina y nocturna.`
+        },
+        {
+          keywords: ["rector", "autoridades", "vicerrector", "coordinadora", "coordinador", "quien dirige"],
+          response: `AUTORIDADES INSTITUCIONALES
+
+• Rector:
+Padre Néstor Alcívar Chávez Manzanilla.
+
+• Vicerrector:
+Magister Pedro Patricio Espinoza.
+
+• Coordinadora de la jornada vespertina:
+Magister Solange Aguilera.
+
+• Coordinadora de la jornada nocturna:
+Magister Denisse Lima.`
+        },
+        {
+          keywords: ["historia", "fundacion", "cuando se fundo", "origen", "resena", "historia institucional"],
+          response: `RESEÑA HISTÓRICA
+
+En el año 1940, el Sr. Obispo de la Diócesis de Loja, Monseñor Nicanor Roberto Aguirre, tuvo la idea de realizar la fundación de la sección diurna La Dolorosa.
+
+La institución se constituyó con la ayuda del clero lojano, siendo su primer rector el Sr. Don Francisco Valdivieso Samaniego.
+
+En el año 2015, mediante Resolución Nro. 0570-15, se autorizó la fusión de las tres secciones, quedando como único nombre Unidad Educativa Fiscomisional La Dolorosa.`
+        },
+        {
+          keywords: ["actualidad", "cuantos estudiantes", "cuantos docentes", "administrativos", "banda civica"],
+          response: `INFORMACIÓN ACTUAL
+
+La Unidad Educativa Fiscomisional “La Dolorosa” cuenta aproximadamente con:
+
+• 89 docentes.
+• 8 administrativos.
+• 1678 estudiantes en jornadas matutina, vespertina y nocturna.
+
+Además, la Banda Cívica tiene una trayectoria de más de 40 años y está conformada por aproximadamente 160 integrantes.`
+        },
+        {
+          keywords: ["modelo educativo", "curriculo", "curriculum", "pedagogico", "educacion"],
+          response: `MODELO EDUCATIVO
+
+La institución trabaja de acuerdo con los lineamientos del Ministerio de Educación y el Nuevo Bachillerato Ecuatoriano.
+
+Su modelo pedagógico institucional es Humanista-Socio-Cultural, fundamentado en lo cognitivo, epistemológico, psicopedagógico y trascendente.
+
+Este modelo se centra en el estudiante como actor principal del aprendizaje, para la vida y desde la vida.`
+        },
+        {
+          keywords: ["retiro de carpeta", "retirar carpeta", "desglose de carpeta", "carpeta", "procedimiento retiro"],
+          response: `PROCEDIMIENTO PARA RETIRO DE CARPETA
+
+Para retirar carpeta debe presentar:
+
+1. Oficio dirigido al Padre Rector Néstor Alcívar Chávez Manzanilla.
+
+2. El oficio debe hacerse firmar por:
+• Padre Rector
+• DECE según la jornada
+• Inspección
+
+3. Certificación de cupo de la institución donde continuará sus estudios.
+
+4. Derecho para desglose de carpeta adquirido en Colecturía.
+
+5. Esta documentación debe ingresarse en Secretaría.`
+        },
+        {
+          keywords: ["colecturia", "pago", "pagar", "banco", "chibuleo"],
+          response: `COLECTURÍA Y PAGOS
+
+Para pagos de matrícula se indica realizar el pago en:
+
+Cooperativa de Ahorro y Crédito CHIBULEO
+Dirección referencial:
+José Antonio Eguiguren entre Sucre y 18 de Noviembre.
+
+También puede comunicarse con Colecturía al:
+072574415`
+        },
+        {
+          keywords: ["secretaria", "secretaría", "documentacion", "entregar documentos", "legalizar"],
+          response: `SECRETARÍA
+
+En Secretaría se entrega y legaliza la documentación según el cronograma institucional.
+
+Contacto:
+• Teléfono: 072570388
+• Extensión: 102
+• Correo: secretaria@ladolorosa-loja.edu.ec`
+        },
+        {
+          keywords: ["inspeccion", "inspector", "disciplina", "acta compromiso", "parametros disciplinarios"],
+          response: `INSPECCIÓN
+
+En Inspección se revisan los parámetros disciplinarios, políticas institucionales y el acta de compromiso.
+
+Extensión:
+• 105 Inspectoría General`
+        },
+        {
+          keywords: ["fe de bautizo", "bautizo", "partida de bautizo"],
+          response: `FE DE BAUTIZO
+
+La copia de la Fe de Bautizo consta como requisito para procesos de inscripción y matrícula, según la información institucional presentada.`
+        },
+        {
+          keywords: ["cedula", "cédula", "documento de identidad", "partida de nacimiento"],
+          response: `DOCUMENTOS DE IDENTIDAD
+
+Para inscripción o matrícula normalmente se solicita:
+
+• Copia de cédula del estudiante o partida de nacimiento.
+• Copia de cédula del padre y madre.
+• Copia de cédula del representante, cuando corresponda.`
+        },
+        {
+          keywords: ["certificado medico", "salud", "discapacidad", "necesidad educativa", "nee", "carnet de vacunas", "vacunas"],
+          response: `CERTIFICADOS DE SALUD
+
+Según el proceso, se puede solicitar:
+
+• Certificado médico actualizado, en caso de necesidad educativa específica asociada o no a discapacidad.
+• Certificado de salud público o privado externo.
+• Copia del carné de vacunas, únicamente para Inicial II.`
+        },
+        {
+          keywords: ["actividades extracurriculares", "deporte", "certificado deportivo", "academicas", "extracurricular"],
+          response: `ACTIVIDADES EXTRACURRICULARES
+
+Si el estudiante realiza actividades académicas o deportivas extracurriculares, debe presentar un certificado avalado por la institución correspondiente, como:
+
+• Ministerio de Educación
+• Ministerio del Deporte
+• Municipio
+
+El certificado debe indicar el horario correspondiente.`
+        },
+        {
+          keywords: ["ficha de datos", "llenar ficha", "ficha estudiante", "formulario", "cedula estudiante"],
+          response: `FICHA DE DATOS DEL ESTUDIANTE
+
+Para llenar la ficha de datos debe ingresar a:
+
+https://ladolorosa-loja.edu.ec/
+
+En el formulario se solicita la cédula del estudiante para continuar con el proceso.`
+        },
+        {
+          keywords: ["herramientas", "tecnologias", "html", "css", "javascript", "js", "que use", "que herramientas estoy usando"],
+          response: `HERRAMIENTAS USADAS EN ESTE PROYECTO
+
+• HTML5: estructura de la página web.
+• CSS3: diseño, colores, animaciones y adaptación responsive.
+• JavaScript Vanilla: funcionamiento del chatbot y respuestas automáticas.
+• SVG: robot e íconos dibujados en código.
+• DOM: permite que JavaScript manipule los mensajes del chat.
+
+No se está usando Java, base de datos, PHP ni frameworks externos.`
+        },
+        {
+          keywords: ["quimica", "química", "atomos", "átomos", "molecula", "molécula", "elementos quimicos", "elementos químicos", "tabla periodica", "tabla periódica", "reaccion quimica", "reacción química", "enlace quimico", "enlace químico"],
+          response: `QUÍMICA — EXPLICACIÓN BÁSICA
+
+La Química es la ciencia que estudia la composición, estructura, propiedades y transformaciones de la materia. Desde los átomos que forman todo lo que nos rodea hasta las complejas reacciones que ocurren en nuestro organismo, la Química nos ayuda a entender el mundo.
+
+TEMAS FUNDAMENTALES:
+• Átomos y moléculas: unidad básica de la materia.
+• Tabla periódica: organiza los elementos según sus propiedades.
+• Enlaces químicos: cómo se unen los átomos (iónico, covalente, metálico).
+• Reacciones químicas: transformación de sustancias.
+
+RECURSOS EDUCATIVOS RECOMENDADOS:
+• Khan Academy (Química):
+https://es.khanacademy.org/science/chemistry
+• Educaplus (Juegos y simulaciones):
+https://www.educaplus.org/quimica/
+• Tabla periódica interactiva:
+https://ptable.com/?lang=es`
+        },
+        {
+          keywords: ["biologia", "biología", "fotosintesis", "fotosíntesis", "celula", "célula", "evolucion", "evolución", "ecosistema", "adn", "genetica", "genética", "seres vivos"],
+          response: `BIOLOGÍA — EXPLICACIÓN BÁSICA
+
+La Biología es la ciencia que estudia la vida y los organismos vivos, desde las células microscópicas hasta los grandes ecosistemas. Comprende cómo funcionan, se relacionan y evolucionan los seres vivos.
+
+TEMAS FUNDAMENTALES:
+• La célula: unidad básica de la vida (procariota y eucariota).
+• Fotosíntesis: proceso donde las plantas convierten luz solar en energía química.
+• Genética y ADN: herencia y transmisión de características.
+• Ecosistemas: relaciones entre organismos y su ambiente.
+
+RECURSOS EDUCATIVOS RECOMENDADOS:
+• Khan Academy (Biología):
+https://es.khanacademy.org/science/biology
+• BioEnciclopedia:
+https://www.bioenciclopedia.com/
+• National Geographic (Biología):
+https://www.nationalgeographicla.com/ciencia`
+        },
+        {
+          keywords: ["matematica", "matemática", "matematicas", "matemáticas", "algebra", "álgebra", "geometria", "geometría", "trigonometria", "trigonometría", "calculo", "cálculo", "ecuacion", "ecuación", "funcion", "función", "numeros", "números"],
+          response: `MATEMÁTICA — EXPLICACIÓN BÁSICA
+
+La Matemática es la ciencia que estudia las propiedades y relaciones de los números, las figuras geométricas y los patrones abstractos. Es una herramienta fundamental para todas las demás ciencias y para la vida cotidiana.
+
+TEMAS FUNDAMENTALES:
+• Álgebra: uso de símbolos y letras para representar números y relaciones.
+• Geometría: estudio de las formas, tamaños y propiedades del espacio.
+• Trigonometría: relaciones entre los ángulos y lados de los triángulos.
+• Cálculo: estudio del cambio y la acumulación (derivadas e integrales).
+
+RECURSOS EDUCATIVOS RECOMENDADOS:
+• Khan Academy (Matemáticas):
+https://es.khanacademy.org/math
+• GeoGebra (Geometría interactiva):
+https://www.geogebra.org/
+• Wolfram Alpha (Cálculos):
+https://www.wolframalpha.com/`
+        },
+        {
+          keywords: ["fisica", "física", "movimiento", "fuerza", "energia", "energía", "leyes de newton", "gravedad", "velocidad", "aceleracion", "aceleración", "electricidad", "magnetismo"],
+          response: `FÍSICA — EXPLICACIÓN BÁSICA
+
+La Física es la ciencia que estudia las propiedades de la materia, la energía, el espacio y el tiempo, así como las interacciones entre ellos. Busca comprender las leyes fundamentales que rigen el universo.
+
+TEMAS FUNDAMENTALES:
+• Movimiento y fuerzas: las leyes de Newton describen cómo se mueven los objetos.
+• Energía: se manifiesta en formas como cinética, potencial, térmica, eléctrica.
+• Electricidad y magnetismo: fenómenos relacionados con cargas eléctricas.
+• Ondas y sonido: propagación de perturbaciones en medios materiales.
+
+RECURSOS EDUCATIVOS RECOMENDADOS:
+• Khan Academy (Física):
+https://es.khanacademy.org/science/physics
+• Educaplus (Simulaciones):
+https://www.educaplus.org/fisica/
+• PhET Simulaciones (Universidad de Colorado):
+https://phet.colorado.edu/es/`
+        },
+        {
+          keywords: ["gracias", "muchas gracias", "ok", "listo", "perfecto"],
+          response: `¡Con gusto! Estoy aquí para ayudarte con información de la Unidad Educativa Fiscomisional “La Dolorosa”.`
+        }
+      ];
+
+      /* Imágenes de horarios institucionales.
+         Las imágenes son administradas manualmente por los responsables del sistema. */
+      const scheduleImages = [
+        {
+          keywords: ["tercero e", "3ro e", "tercero egb", "3° e", "tercero de basica e", "tercer año e"],
+          image: "./img/horario_tercero_e.jpg",
+          label: "Horario de exámenes - Tercero E"
+        }
+      ];
+
+      function getScheduleResponse(text) {
+        if (!includesAny(text, ["horario de examenes", "horario examenes", "horario de exámenes", "dame el horario", "muestra el horario", "cual es el horario", "cuál es el horario"])) {
+          return null;
+        }
+        const match = scheduleImages.find(item => includesAny(text, item.keywords));
+        if (match) {
+          return `${match.label}\n\n${match.image}`;
+        }
+        return `Puedo mostrarte horarios de exámenes. Por favor, especifica el curso. Ejemplo:\n\n"Dame el horario de exámenes de tercero E"`;
+      }
+
+      /* Abre el chatbot y coloca el cursor en el campo de texto. */
+      function openChat() {
+        chatPanel.classList.add("open");
+        setTimeout(() => chatInput.focus(), 100);
+      }
+
+      /* Cierra el chatbot. */
+      function closeChat() {
+        chatPanel.classList.remove("open");
+      }
+
+      /* Alterna entre abrir y cerrar el chatbot. */
+      function toggleChat() {
+        chatPanel.classList.toggle("open");
+        if (chatPanel.classList.contains("open")) {
+          setTimeout(() => chatInput.focus(), 100);
+        }
+      }
+
+      /* Agrega un mensaje en la ventana del chat.
+         También convierte enlaces en botones clicables sin usar HTML peligroso. */
+      function addMessage(text, type = "bot") {
+        const div = document.createElement("div");
+        div.className = `chat-message ${type}`;
+
+        const parts = String(text).split(/(https?:\/\/[^\s]+|www\.[^\s]+|\.\/[^\s]+)/g);
+        let linkNumber = 1;
+        parts.forEach(part => {
+          if (/^(https?:\/\/|www\.|\.\/)/.test(part)) {
+            const isImage = /\.(jpe?g|png|gif|webp|svg)(\?.*)?$/i.test(part);
+            if (isImage) {
+              const img = document.createElement("img");
+              img.src = part.startsWith("./") ? part : part;
+              img.alt = "Imagen institucional";
+              img.style.maxWidth = "100%";
+              img.style.borderRadius = "12px";
+              img.style.marginTop = "8px";
+              img.style.boxShadow = "0 4px 12px rgba(0,0,0,.15)";
+              div.appendChild(img);
+            } else {
+              const link = document.createElement("a");
+              link.href = part.startsWith("www.") ? `https://${part}` : part;
+              link.textContent = linkNumber === 1 ? "🔗 Abrir enlace" : `🔗 Abrir enlace ${linkNumber}`;
+              link.title = part;
+              link.target = "_blank";
+              link.rel = "noopener noreferrer";
+              div.appendChild(link);
+              linkNumber += 1;
+            }
+          } else {
+            div.appendChild(document.createTextNode(part));
+          }
+        });
+
+        chatBody.appendChild(div);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }
+
+      /* Normaliza el texto: lo pasa a minúsculas y elimina tildes.
+         Así el chatbot entiende “matrícula” y “matricula”. */
+      function normalizeText(input) {
+        return input
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+      }
+
+      /* Revisa si el texto contiene alguna palabra clave. */
+      function includesAny(text, words) {
+        return words.some(word => text.includes(normalizeText(word)));
+      }
+
+
+      /* Información extraída de las páginas subidas: Informativo, Documentos Institucionales y Galería. */
+      const websiteSections = [
+        {
+                "category": "Página web institucional",
+                "title": "Página principal",
+                "description": "Inicio de la página oficial de la Unidad Educativa Fiscomisional La Dolorosa.",
+                "link": "https://ladolorosa-loja.edu.ec/index.html",
+                "keywords": [
+                        "pagina web",
+                        "página web",
+                        "sitio web",
+                        "inicio",
+                        "web institucional",
+                        "link de la institución",
+                        "enlace principal"
+                ]
+        },
+        {
+                "category": "Informativo",
+                "title": "Informativo institucional",
+                "description": "Sección donde se publican comunicados, cronogramas, listas, uniformes y avisos para estudiantes y padres de familia.",
+                "link": "https://ladolorosa-loja.edu.ec/informativo.html",
+                "keywords": [
+                        "informativo",
+                        "comunicados",
+                        "avisos",
+                        "informacion institucional",
+                        "información institucional"
+                ]
+        },
+        {
+                "category": "Informativo",
+                "title": "Retiro de carpeta",
+                "description": "La página informativa presenta un aviso sobre retiro de carpeta mediante imagen institucional.",
+                "link": "https://ladolorosa-loja.edu.ec/informativo.html",
+                "keywords": [
+                        "retiro de carpeta",
+                        "retirar carpeta",
+                        "carpeta",
+                        "desglose de carpeta"
+                ]
+        },
+        {
+                "category": "Informativo",
+                "title": "Cronograma de convivencias 2025-2026",
+                "description": "Documento del Departamento de Pastoral para las convivencias del año lectivo 2025-2026.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/CRONOGRAMA%20CONVIVENCIAS%202025-2026.pdf",
+                "keywords": [
+                        "cronograma de convivencias",
+                        "convivencias",
+                        "pastoral",
+                        "departamento de pastoral",
+                        "convivencias 2025",
+                        "convivencias 2026"
+                ]
+        },
+        {
+                "category": "Informativo",
+                "title": "Cronograma de misas dominicales 2025-2026",
+                "description": "Documento del Departamento de Pastoral con el cronograma de eucaristías o misas dominicales.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/CRONOGRAMA%20EUCARISTIAS%202025%202026.pdf",
+                "keywords": [
+                        "misas",
+                        "misas dominicales",
+                        "eucaristias",
+                        "eucaristías",
+                        "cronograma de misas",
+                        "cronograma eucaristias",
+                        "pastoral"
+                ]
+        },
+        {
+                "category": "Informativo",
+                "title": "Lugares de atención a padres de familia",
+                "description": "Información para atención a PPFF, especialmente en la sección matutina, con horarios y lugares designados.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/ATENCI%C3%93N%20A%20PADRES%20DE%20FAMILIA%202022.pdf",
+                "keywords": [
+                        "padres de familia",
+                        "ppff",
+                        "atencion a padres",
+                        "atención a padres",
+                        "lugares de atencion",
+                        "horarios padres"
+                ]
+        },
+        {
+                "category": "Informativo",
+                "title": "Cronograma del año lectivo 2024-2025",
+                "description": "Acceso a cronograma institucional publicado en Google Sheets.",
+                "link": "https://docs.google.com/spreadsheets/d/1MZa0UKjKErbPsFmnzvxch_xIpdD-r954wLDIxa5zjOM/edit#gid=641531030",
+                "keywords": [
+                        "cronograma",
+                        "año lectivo",
+                        "ano lectivo",
+                        "calendario",
+                        "cronograma 2024",
+                        "cronograma 2025"
+                ]
+        },
+        {
+                "category": "Informativo",
+                "title": "Docentes tutores de grados y cursos 2025-2026",
+                "description": "Lista institucional de docentes tutores y teléfonos para grados y cursos.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/DOCENTES%20TUTORES%202025-2026.pdf",
+                "keywords": [
+                        "docentes tutores",
+                        "tutores",
+                        "lista de tutores",
+                        "telefonos docentes",
+                        "teléfonos docentes",
+                        "docentes 2025"
+                ]
+        },
+        {
+                "category": "Informativo",
+                "title": "Lista de útiles 2025-2026",
+                "description": "Documento con la lista de útiles escolares para el año lectivo 2025-2026.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/lista-utiles-2025-2026.pdf",
+                "keywords": [
+                        "lista de utiles",
+                        "lista de útiles",
+                        "utiles escolares",
+                        "útiles escolares",
+                        "materiales",
+                        "utiles 2025"
+                ]
+        },
+        {
+                "category": "Informativo",
+                "title": "Uniformes 2025-2026",
+                "description": "Documento con información y detalle de uniformes institucionales.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/UNIFORMES%202025-2026.pdf",
+                "keywords": [
+                        "uniformes",
+                        "uniforme",
+                        "uniformes 2025",
+                        "uniformes 2026",
+                        "ropa institucional"
+                ]
+        },
+        {
+                "category": "Informativo",
+                "title": "Bar institucional",
+                "description": "La página indica que el menú del bar presenta constante variación.",
+                "link": "https://ladolorosa-loja.edu.ec/informativo.html",
+                "keywords": [
+                        "bar",
+                        "menu del bar",
+                        "menú del bar",
+                        "comida",
+                        "cafeteria",
+                        "cafetería"
+                ]
+        },
+        {
+                "category": "Documentos institucionales",
+                "title": "Código de Convivencia Institucional 2025-2026",
+                "description": "Documento institucional del Ministerio de Educación para la Unidad Educativa Fiscomisional La Dolorosa.",
+                "link": "https://ladolorosa-loja.edu.ec/documentos/CodigoConvivencia-2526.pdf",
+                "keywords": [
+                        "codigo de convivencia",
+                        "código de convivencia",
+                        "convivencia institucional",
+                        "normas de convivencia",
+                        "codigo convivencia"
+                ]
+        },
+        {
+                "category": "Documentos institucionales",
+                "title": "Modelo de Evaluación Institucional 2025-2026",
+                "description": "Modelo institucional de evaluación publicado para el periodo 2025-2026.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/ModeloEvaluacionInstitucionalUEFLD25-26.pdf",
+                "keywords": [
+                        "modelo de evaluacion",
+                        "modelo de evaluación",
+                        "evaluacion institucional",
+                        "evaluación institucional",
+                        "modelo institucional 2025"
+                ]
+        },
+        {
+                "category": "Documentos institucionales",
+                "title": "Ejes Transversales",
+                "description": "Documento institucional sobre ejes transversales.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/EJES%20TRANSVERSALES.pdf",
+                "keywords": [
+                        "ejes transversales",
+                        "transversales",
+                        "ejes"
+                ]
+        },
+        {
+                "category": "Documentos institucionales",
+                "title": "Modelo de Evaluación Institucional 2024-2025",
+                "description": "Modelo de evaluación institucional del periodo 2024-2025.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/Modelo%20Evaluaci%C3%B3n%20Institucional%20UEFLD%2024-25.pdf",
+                "keywords": [
+                        "modelo evaluacion 2024",
+                        "modelo evaluación 2024",
+                        "modelo evaluacion 2025",
+                        "modelo evaluación 2025"
+                ]
+        },
+        {
+                "category": "Documentos institucionales",
+                "title": "Resolución de costos 2025-2026",
+                "description": "Resolución institucional relacionada con costos del periodo 2025-2026.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/RESOLUCION%20COSTOS%202025-2026.pdf",
+                "keywords": [
+                        "resolucion costos",
+                        "resolución costos",
+                        "costos",
+                        "valor matricula",
+                        "valores",
+                        "pensiones",
+                        "costo 2025"
+                ]
+        },
+        {
+                "category": "Documentos institucionales",
+                "title": "Procedimiento para aplicación de becas",
+                "description": "Documento sobre aplicación de becas para instituciones particulares y fiscomisionales.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/aplicacion-becas-particulares-y-fiscomisionales-junio-2018.pdf",
+                "keywords": [
+                        "becas",
+                        "procedimiento becas",
+                        "aplicacion de becas",
+                        "aplicación de becas",
+                        "beca"
+                ]
+        },
+        {
+                "category": "Documentos institucionales",
+                "title": "Reglamento interno para concesión de becas 2025-2026",
+                "description": "Reglamento de becas 2025-2026 del Consejo Ejecutivo de la Unidad Educativa Fiscomisional La Dolorosa.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/REGLAMENTO%20DE%20BECAS%202025%202026.pdf",
+                "keywords": [
+                        "reglamento de becas",
+                        "concesion de becas",
+                        "concesión de becas",
+                        "becas 2025",
+                        "becas 2026"
+                ]
+        },
+        {
+                "category": "Documentos institucionales",
+                "title": "Propósitos y objetivos institucionales 2023-2024",
+                "description": "Documento institucional sobre propósitos y objetivos de la institución.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/PROPOSITO%20Y%20OBJE%20INSTITUCIONAL.pdf",
+                "keywords": [
+                        "propositos",
+                        "propósitos",
+                        "objetivos institucionales",
+                        "proposito institucional",
+                        "propósito institucional"
+                ]
+        },
+        {
+                "category": "Documentos institucionales",
+                "title": "Plan de Gestión de Riesgos 2025-2026",
+                "description": "Documento de la Comisión de Gestión de Riesgos Institucionales 2025-2026.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/PlanGestionRiesgos25-26.pdf",
+                "keywords": [
+                        "gestion de riesgos",
+                        "gestión de riesgos",
+                        "riesgos",
+                        "plan de riesgos",
+                        "comision de riesgos",
+                        "comisión de riesgos"
+                ]
+        },
+        {
+                "category": "Documentos institucionales",
+                "title": "Permiso de funcionamiento Bomberos 2026",
+                "description": "Documento de Jefatura de Prevención de Incendios y permiso de funcionamiento Bomberos 2026.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/uefld-bomberos-2026.pdf",
+                "keywords": [
+                        "bomberos",
+                        "permiso bomberos",
+                        "permiso de funcionamiento bomberos",
+                        "incendios",
+                        "prevencion de incendios"
+                ]
+        },
+        {
+                "category": "Documentos institucionales",
+                "title": "Permiso de funcionamiento y ampliación de oferta educativa",
+                "description": "Permiso institucional relacionado con funcionamiento y ampliación de oferta educativa.",
+                "link": "https://ladolorosa-loja.edu.ec/pdf/PERMISO%20DE%20FUNCIONAMIENTO%20Y%20AMPLIZACION%20DE%20OFERTA%2000380-r.pdf",
+                "keywords": [
+                        "permiso de funcionamiento",
+                        "ampliacion de oferta",
+                        "ampliación de oferta",
+                        "oferta educativa",
+                        "permiso institucional"
+                ]
+        },
+        {
+                "category": "Galería",
+                "title": "Cuadro de honor 2025-2026 - Jornada Matutina",
+                "description": "Imagen publicada en la galería de fotos institucional.",
+                "link": "https://ladolorosa-loja.edu.ec/galeria.html",
+                "keywords": [
+                        "cuadro de honor",
+                        "jornada matutina",
+                        "honor matutina",
+                        "galeria",
+                        "galería"
+                ]
+        },
+        {
+                "category": "Galería",
+                "title": "Cuadro de honor 2025-2026 - Jornada Nocturna",
+                "description": "Imagen publicada en la galería de fotos institucional.",
+                "link": "https://ladolorosa-loja.edu.ec/galeria.html",
+                "keywords": [
+                        "cuadro de honor",
+                        "jornada nocturna",
+                        "honor nocturna",
+                        "galeria",
+                        "galería"
+                ]
+        },
+        {
+                "category": "Galería",
+                "title": "Reconocimiento por 85 años de vida institucional",
+                "description": "Publicación de reconocimiento por los 85 años de vida institucional.",
+                "link": "https://ladolorosa-loja.edu.ec/galeria.html",
+                "keywords": [
+                        "85 años",
+                        "85 anos",
+                        "vida institucional",
+                        "reconocimiento",
+                        "aniversario"
+                ]
+        },
+        {
+                "category": "Galería",
+                "title": "Miércoles de Ceniza y Cuaresma",
+                "description": "Publicación sobre el inicio de la Cuaresma con el Miércoles de Ceniza, después de las fiestas de Carnaval.",
+                "link": "https://ladolorosa-loja.edu.ec/galeria.html",
+                "keywords": [
+                        "miercoles de ceniza",
+                        "miércoles de ceniza",
+                        "cuaresma",
+                        "carnaval",
+                        "polvo eres"
+                ]
+        },
+        {
+                "category": "Galería",
+                "title": "Fiestas Patronales 2022-2023",
+                "description": "Registro visual de las fiestas patronales 2022-2023.",
+                "link": "https://ladolorosa-loja.edu.ec/galeria.html",
+                "keywords": [
+                        "fiestas patronales",
+                        "fiestas",
+                        "patronales",
+                        "fiestas 2022",
+                        "fiestas 2023"
+                ]
+        },
+        {
+                "category": "Galería",
+                "title": "82 años de vida institucional - Fiestas Patronales del 18 al 20 de abril de 2022",
+                "description": "Publicación de fiestas patronales por 82 años de vida institucional y eucaristía del 20 de abril en honor a La Dolorosa.",
+                "link": "https://ladolorosa-loja.edu.ec/galeria.html",
+                "keywords": [
+                        "82 años",
+                        "82 anos",
+                        "18 de abril",
+                        "20 de abril",
+                        "eucaristia",
+                        "eucaristía",
+                        "madre dolorosa"
+                ]
+        },
+        {
+                "category": "Galería",
+                "title": "Abanderados y actos cívicos",
+                "description": "Galería con publicaciones de abanderados 2021-2022, jornada matutina, jornada nocturna y actos de bandera.",
+                "link": "https://ladolorosa-loja.edu.ec/galeria.html",
+                "keywords": [
+                        "abanderados",
+                        "abanderado",
+                        "bandera",
+                        "actos civicos",
+                        "actos cívicos",
+                        "juramento"
+                ]
+        },
+        {
+                "category": "Galería",
+                "title": "Banda cívica y actividades institucionales",
+                "description": "Galería con imágenes de la banda, actividades educativas, sismos, autoridades y eventos institucionales.",
+                "link": "https://ladolorosa-loja.edu.ec/galeria.html",
+                "keywords": [
+                        "banda",
+                        "banda civica",
+                        "banda cívica",
+                        "sismo",
+                        "actividades institucionales",
+                        "galeria"
+                ]
+        },
+        {
+                "category": "Accesos",
+                "title": "Consulta de calificaciones",
+                "description": "Enlace institucional para consultar calificaciones.",
+                "link": "https://ladolorosa-loja.edu.ec/gestaca/gestaca.php",
+                "keywords": [
+                        "calificaciones",
+                        "notas",
+                        "gestaca",
+                        "consultar calificaciones",
+                        "sistema de calificaciones"
+                ]
+        },
+        {
+                "category": "Accesos",
+                "title": "Ingreso Secretaría",
+                "description": "Acceso interno para Secretaría.",
+                "link": "https://ladolorosa-loja.edu.ec/notas/sistema.php",
+                "keywords": [
+                        "secretaria",
+                        "secretaría",
+                        "ingreso secretaria",
+                        "sistema secretaria"
+                ]
+        },
+        {
+                "category": "Accesos",
+                "title": "Ingreso Docentes",
+                "description": "Acceso interno para docentes.",
+                "link": "https://ladolorosa-loja.edu.ec/notas/ingreso.php",
+                "keywords": [
+                        "docentes",
+                        "ingreso docentes",
+                        "sistema docentes",
+                        "profesores"
+                ]
+        },
+        {
+                "category": "Accesos",
+                "title": "Secretaría Intensivo",
+                "description": "Acceso para Secretaría Intensivo.",
+                "link": "https://ladolorosa-loja.edu.ec/intensivo/sistema.php",
+                "keywords": [
+                        "secretaria intensivo",
+                        "secretaría intensivo",
+                        "intensivo"
+                ]
+        },
+        {
+                "category": "Accesos",
+                "title": "Docentes Intensivo",
+                "description": "Acceso para docentes del intensivo.",
+                "link": "https://ladolorosa-loja.edu.ec/intensivo/ingreso.php",
+                "keywords": [
+                        "docentes intensivo",
+                        "profesores intensivo",
+                        "intensivo docentes"
+                ]
+        },
+        {
+                "category": "Accesos",
+                "title": "Consultar",
+                "description": "Acceso institucional para consultas.",
+                "link": "https://ladolorosa-loja.edu.ec/todos/sistema.php",
+                "keywords": [
+                        "consultar",
+                        "consulta institucional",
+                        "sistema consultar"
+                ]
+        },
+        {
+                "category": "Contacto",
+                "title": "Facebook institucional",
+                "description": "Página oficial de Facebook de la Unidad Educativa.",
+                "link": "https://www.facebook.com/UEFLD/",
+                "keywords": [
+                        "facebook",
+                        "redes sociales",
+                        "red social",
+                        "pagina facebook"
+                ]
+        },
+        {
+                "category": "Contacto",
+                "title": "Email institucional",
+                "description": "Acceso al correo institucional webmail.",
+                "link": "https://ladolorosa-loja.edu.ec:2096/",
+                "keywords": [
+                        "email",
+                        "correo",
+                        "correo institucional",
+                        "webmail"
+                ]
+        },
+        {
+                "category": "Contacto",
+                "title": "Dirección y teléfono publicados en la web",
+                "description": "Dirección: Olmedo y José Antonio Eguiguren. Teléfono: (07) 2570388 / 2574415.",
+                "link": "https://ladolorosa-loja.edu.ec/index.html",
+                "keywords": [
+                        "direccion",
+                        "dirección",
+                        "telefono",
+                        "teléfono",
+                        "ubicacion",
+                        "ubicación",
+                        "olmedo",
+                        "eguiguren"
+                ]
+        }
+];
+
+      function getWebsiteItemLine(item) {
+        return `• ${item.title}
+  ${item.description}
+  ${item.link}`;
+      }
+
+      function getWebsiteCategoryReport(categoryName) {
+        const items = websiteSections.filter(item => item.category === categoryName);
+        if (!items.length) return null;
+        return `${categoryName.toUpperCase()}
+
+${items.map(getWebsiteItemLine).join("\n\n")}`;
+      }
+
+      function getWebsiteGeneralReport() {
+        return `INFORMACIÓN CARGADA DESDE LA PÁGINA WEB INSTITUCIONAL
+
+Puedo responder consultas sobre:
+
+• Informativo: retiro de carpeta, convivencias 2025-2026, misas dominicales, atención a padres de familia, cronograma, docentes tutores, lista de útiles, uniformes y bar.
+• Documentos institucionales: Código de Convivencia, Modelo de Evaluación, Ejes Transversales, Resolución de Costos, becas, objetivos institucionales, gestión de riesgos, bomberos y permisos.
+• Galería: cuadro de honor, fiestas patronales, 85 años de vida institucional, Miércoles de Ceniza, abanderados, banda cívica y actos institucionales.
+• Accesos: calificaciones, Secretaría, Docentes, Intensivo, Consultar, Facebook y Email.
+
+Ejemplos:
+“dame los documentos institucionales”
+“lista de útiles 2025-2026”
+“uniformes 2025-2026”
+“cronograma de convivencias”
+“becas 2025-2026”
+“cuadro de honor”
+“fiestas patronales”
+“calificaciones institucionales”`;
+      }
+
+      function getWebsiteInfoResponse(text) {
+        const asksInstitutionalDocs = includesAny(text, ["documentos institucionales", "documentacion institucional", "documentación institucional", "documentos de la institucion", "documentos de la institución"]);
+        const asksInformativo = includesAny(text, ["informativo institucional", "seccion informativo", "sección informativo", "avisos institucionales"]);
+        const asksGallery = includesAny(text, ["galeria de fotos", "galería de fotos", "seccion galeria", "sección galería"]);
+        const asksAccess = includesAny(text, ["accesos", "ingresar", "secretaria", "secretaría", "docentes", "sistema", "email institucional", "facebook institucional"]);
+        const asksAllWeb = includesAny(text, ["toda la informacion", "toda la información", "informacion de la web", "información de la web", "pagina web institucional", "página web institucional", "que hay en la pagina", "qué hay en la página", "web la dolorosa"]);
+
+        if (asksAllWeb) return getWebsiteGeneralReport();
+        if (asksInstitutionalDocs) return getWebsiteCategoryReport("Documentos institucionales");
+        if (asksInformativo) return getWebsiteCategoryReport("Informativo");
+        if (asksGallery) return getWebsiteCategoryReport("Galería");
+        if (asksAccess) {
+          const accessReport = getWebsiteCategoryReport("Accesos");
+          const contactReport = getWebsiteCategoryReport("Contacto");
+          return `${accessReport}
+
+${contactReport}`;
+        }
+
+        let matches = websiteSections.filter(item => includesAny(text, item.keywords));
+
+        if (includesAny(text, ["becas", "beca"])) {
+          matches = websiteSections.filter(item => includesAny(item.title + " " + item.description, ["becas", "beca"]));
+        }
+
+        if (includesAny(text, ["cronograma"])) {
+          const cronogramMatches = websiteSections.filter(item => includesAny(item.title + " " + item.description, ["cronograma"]));
+          if (cronogramMatches.length) matches = cronogramMatches;
+        }
+
+        if (matches.length) {
+          const unique = [];
+          const seen = new Set();
+          matches.forEach(item => {
+            const key = item.title + item.link;
+            if (!seen.has(key)) {
+              seen.add(key);
+              unique.push(item);
+            }
+          });
+
+          const limited = unique.slice(0, 8);
+          let output = `ENCONTRÉ ESTA INFORMACIÓN EN LA WEB INSTITUCIONAL
+
+${limited.map(getWebsiteItemLine).join("\n\n")}`;
+          if (unique.length > limited.length) output += `
+
+Hay más resultados. Puedes preguntar más específico, por ejemplo: “documentos institucionales”, “informativo” o “galería”.`;
+          return output;
+        }
+
+        return null;
+      }
+
+      /* Busca la mejor respuesta según las palabras clave. */
+      function getBotResponse(input) {
+        const text = normalizeText(input);
+
+        const scheduleResponse = getScheduleResponse(text);
+        if (scheduleResponse) return scheduleResponse;
+
+        const websiteResponse = getWebsiteInfoResponse(text);
+        if (websiteResponse) return websiteResponse;
+
+        const found = knowledgeBase.find(item => includesAny(text, item.keywords));
+
+        if (found) {
+          return found.response;
+        }
+
+        return `Gracias por tu consulta. Por el momento puedo ayudarte con información sobre:
+
+• Inscripciones y matrículas
+• Requisitos para estudiantes nuevos y antiguos
+• Horarios de entrevista del DECE e institucional
+• Valores de matrícula y pensión
+• Retiro de carpeta
+• Oferta educativa y jornadas disponibles
+• Autoridades institucionales
+• Contactos, correos y ubicación
+• Historia y modelo educativo de la institución
+• Promotores del proyecto
+• Documentos institucionales e informativos
+• Lista de útiles, uniformes y becas
+• Galería de fotos institucional
+• Accesos a calificaciones, secretaría y docentes
+
+Ejemplos:
+“requisitos de inscripción”
+“documentos institucionales”
+“lista de útiles 2025-2026”
+“uniformes 2025-2026”
+“becas 2025-2026”
+“galería de fotos”
+“promotores del proyecto”
+“contacto del proyecto”`;
+      }
+
+      /* Envía el mensaje escrito por el usuario y muestra la respuesta del bot. */
+      function sendMessage() {
+        const text = chatInput.value.trim();
+        if (!text) return;
+
+        addMessage(text, "user");
+        chatInput.value = "";
+
+        setTimeout(() => {
+          const response = getBotResponse(text);
+          addMessage(response, "bot");
+        }, 350);
+      }
+
+      /* Permite que los botones rápidos envíen una pregunta automática. */
+      function askQuick(text) {
+        openChat();
+        chatInput.value = text;
+        sendMessage();
+      }
+
+      /* Eventos principales del chatbot. */
+      chatFab.addEventListener("click", toggleChat);
+      chatCloseBtn.addEventListener("click", closeChat);
+      chatSendBtn.addEventListener("click", sendMessage);
+
+      /* Permite enviar el mensaje presionando Enter. */
+      chatInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          sendMessage();
+        }
+      });
+
+      /* Estas funciones se hacen globales para usarlas en botones con onclick. */
+      window.openChat = openChat;
+      window.closeChat = closeChat;
+      window.toggleChat = toggleChat;
+      window.askQuick = askQuick;
+    });
+  </script>
+</body>
+</html>
